@@ -1,0 +1,218 @@
+@startuml BattleGameClassDiagram
+
+!theme plain
+skinparam classAttributeIconSize 0
+skinparam classFontStyle bold
+
+' Clase abstracta Combatiente
+abstract class Combatiente {
+  # nombre : String
+  # vidaMaxima : int
+  # vidaActual : int
+  # poderAtaque : int
+  # estaVivo : boolean
+  --
+  # Combatiente(nombre : String, vida : int, ataque : int)
+  + atacar(objetivo : Combatiente) : void
+  + recibirDanio(danio : int) : void
+  + curar(cantidad : int) : void
+  + estaVivo() : boolean
+  + {abstract} tomarTurno(objetivos : ArrayList<Combatiente>) : void
+  + {abstract} habilidadEspecial(objetivos : ArrayList<Combatiente>) : void
+  + {abstract} mensajeInicio() : String
+  + {abstract} mensajeMuerte() : String
+  + {abstract} mensajeVictoria() : String
+  + getNombre() : String
+  + getVidaActual() : int
+  + getVidaMaxima() : int
+  + getPoderAtaque() : int
+}
+
+' Clase abstracta Jugador
+abstract class Jugador {
+  # items : ArrayList<Item>
+  # capacidadItems : int
+  --
+  # Jugador(nombre : String, vida : int, ataque : int, capacidad : int)
+  + usarItem(indiceItem : int, objetivo : Combatiente) : boolean
+  + agregarItem(item : Item) : boolean
+  + mostrarItems() : String
+  + tieneItems() : boolean
+  # {abstract} inicializarItems() : void
+}
+
+' Clase Guerrero
+class Guerrero {
+  - {static} VIDA_BASE : int = 120
+  - {static} ATAQUE_BASE : int = 25
+  - {static} CAPACIDAD_ITEMS : int = 3
+  --
+  + Guerrero(nombre : String)
+  # inicializarItems() : void
+  + tomarTurno(objetivos : ArrayList<Combatiente>) : void
+  + habilidadEspecial(objetivos : ArrayList<Combatiente>) : void
+  + mensajeInicio() : String
+  + mensajeMuerte() : String
+  + mensajeVictoria() : String
+}
+
+' Clase Explorador
+class Explorador {
+  - {static} VIDA_BASE : int = 100
+  - {static} ATAQUE_BASE : int = 20
+  - {static} CAPACIDAD_ITEMS : int = 6
+  --
+  + Explorador(nombre : String)
+  # inicializarItems() : void
+  + tomarTurno(objetivos : ArrayList<Combatiente>) : void
+  + habilidadEspecial(objetivos : ArrayList<Combatiente>) : void
+  + mensajeInicio() : String
+  + mensajeMuerte() : String
+  + mensajeVictoria() : String
+}
+
+' Clase abstracta Enemigo
+abstract class Enemigo {
+  # tipoEnemigo : String
+  # esJefe : boolean
+  --
+  # Enemigo(nombre : String, vida : int, ataque : int, esJefe : boolean)
+  + tomarTurno(objetivos : ArrayList<Combatiente>) : void
+  # aplicarBonusJefe() : void
+  + getEsJefe() : boolean
+}
+
+' Clase Goblin
+class Goblin {
+  - {static} VIDA_BASE : int = 60
+  - {static} ATAQUE_BASE : int = 15
+  - esquivaActiva : boolean
+  --
+  + Goblin(esJefe : boolean)
+  + habilidadEspecial(objetivos : ArrayList<Combatiente>) : void
+  + recibirDanio(danio : int) : void
+  + mensajeInicio() : String
+  + mensajeMuerte() : String
+  + mensajeVictoria() : String
+}
+
+' Clase GoblinJefe
+class GoblinJefe {
+  - {static} VIDA_BASE : int = 100
+  - {static} ATAQUE_BASE : int = 25
+  - ataquesFuriosos : int
+  --
+  + GoblinJefe()
+  + ataquesFuriosos(objetivo : Combatiente) : void
+  + mensajeInicio() : String
+  + mensajeMuerte() : String
+  + mensajeVictoria() : String
+}
+
+' Clase Orco
+class Orco {
+  - {static} VIDA_BASE : int = 80
+  - {static} ATAQUE_BASE : int = 20
+  - puedeRegenerarse : boolean
+  --
+  + Orco(esJefe : boolean)
+  + habilidadEspecial(objetivos : ArrayList<Combatiente>) : void
+  + mensajeInicio() : String
+  + mensajeMuerte() : String
+  + mensajeVictoria() : String
+}
+
+' Clase OrcoJefe
+class OrcoJefe {
+  - {static} VIDA_BASE : int = 140
+  - {static} ATAQUE_BASE : int = 30
+  - armaduraActivada : boolean
+  - turnosArmadura : int
+  --
+  + OrcoJefe()
+  + activarArmadura() : void
+  + recibirDanio(danio : int) : void
+  + mensajeInicio() : String
+  + mensajeMuerte() : String
+  + mensajeVictoria() : String
+}
+
+' Clase Item
+class Item {
+  - nombre : String
+  - tipo : String
+  - valor : int
+  - descripcion : String
+  --
+  + Item(nombre : String, tipo : String, valor : int, desc : String)
+  + usar(objetivo : Combatiente) : void
+  + getNombre() : String
+  + getDescripcion() : String
+  + getTipo() : String
+  + getValor() : int
+}
+
+' Clase Batalla
+class Batalla {
+  - jugador : Jugador
+  - enemigos : ArrayList<Enemigo>
+  - combatientes : ArrayList<Combatiente>
+  - turnoActual : int
+  - batallaEnCurso : boolean
+  - logBatalla : LogBatalla
+  --
+  + Batalla(jugador : Jugador)
+  + iniciarBatalla() : void
+  - generarEnemigos() : void
+  - procesarTurno(combatiente : Combatiente) : void
+  - mostrarEstadoBatalla() : void
+  - verificarCondicionesVictoria() : boolean
+  - siguienteTurno() : void
+  - obtenerObjetivosDisponibles(atacante : Combatiente) : ArrayList<Combatiente>
+}
+
+' Clase LogBatalla
+class LogBatalla {
+  - acciones : ArrayList<String>
+  - {static} MAX_ACCIONES : int = 3
+  --
+  + LogBatalla()
+  + agregarAccion(accion : String) : void
+  + mostrarUltimasAcciones() : String
+}
+
+' Clase BattleSimulator (Main)
+class BattleSimulator {
+  --
+  + {static} main(args : String[]) : void
+  - {static} mostrarMenuPrincipal() : void
+  - {static} crearJugador() : Jugador
+  - {static} iniciarNuevaBatalla(jugador : Jugador) : void
+  - {static} mostrarInstrucciones() : void
+}
+
+' Relaciones de herencia
+Combatiente <|-- Jugador
+Combatiente <|-- Enemigo
+
+Jugador <|-- Guerrero
+Jugador <|-- Explorador
+
+Enemigo <|-- Goblin
+Enemigo <|-- Orco
+
+Goblin <|-- GoblinJefe
+Orco <|-- OrcoJefe
+
+' Relaciones de composición y agregación
+Jugador "1" *-- "0..*" Item : contiene
+Batalla "1" *-- "1" LogBatalla : tiene
+Batalla "1" o-- "1" Jugador : controla
+Batalla "1" o-- "1..3" Enemigo : enfrenta
+
+' Dependencias
+BattleSimulator ..> Batalla : crea
+BattleSimulator ..> Jugador : crea
+Batalla ..> Combatiente : usa
+
+@enduml
